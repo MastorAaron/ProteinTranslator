@@ -8,6 +8,24 @@ import logomaker
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from ambigMap import ambigMap
+
+# def generateExternalMap():
+    # # import json
+
+    # # with open("ambigMap.json", "w") as f:
+    # #     json.dump(ambigMap, f, indent=4, separators=(",", ": "))
+
+    # with open("ambigMap1.py", "w") as f:
+    #     f.write("ambigMap = ")
+    #     f.write(repr(ambigMap))
+        
+    # import pprint
+
+    # with open("ambigMap.py", "w") as f:
+    #     f.write("ambigMap = \\\n")
+    #     pprint.pprint(ambigMap, stream=f, indent=2, width=80)
+
 def textBool(bool):
     return "Yes" if bool else "No"
 
@@ -245,7 +263,7 @@ def genAmbigList(ambigCodons):
 def extractFreqs(ambigMap, Codon):
     return{amino: [len(locations)] for amino, (locations) in ambigMap[Codon].items()}
 
-def logoMaker(ambigMap, Codon):
+def logoMaker(Codon):
     freqMap = extractFreqs(ambigMap, Codon)
     allAminos = "ACDEFGHIKLMNPQRSTVWY"
     
@@ -267,40 +285,41 @@ def logoMaker(ambigMap, Codon):
     logomaker.Logo(dataFrame, color_scheme='chemistry', font_name='Arial', shade_below=.5, fade_below=.5)
     plt.title(f"Codon {Codon} - Amino Acid Mapping Profile")
     plt.show()
-    
-
-
-# {
-#     'AAA': {
-#         'K': [[2, 3, 4, 5, 6, 10, 11, 12, 13, 15, 16, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33], 23],
-#         'N': [[14, 21], 2]
-#          }
-# }
-
-
 
 ambigCodons = ["AAA","AGA","AGG","ATA","CTA","CTC","CTG","CTT","TAA","TAG","TCA","TGA","TTA"]
+def isAmbig(codon):
+    return codon in ambigCodons
 
-# aminoMap = { 'A': [[tableNums], freq]}
-# codonMap = {"AAA" : [aminoMap]}
+def hasFrameShift(DNA,Aminos):
+    print(f"DNA:    {(len(DNA) / 3)}")
+    print(f"Aminos: {(len(Aminos))}")
+    return (len(DNA) / 3) != (len(Aminos)) 
+
+def printBool(bool):
+    print(textBool(bool))
+
+#templates
+    # aminoMap = { 'A': [[tableNums], freq]} #old form
+    # aminoMap = { 'A': [tableNums]}        #refactor form
+    # codonMap = {"AAA" : [aminoMap]}
 
 # main# main# main# main# main# main# main# main# main# main# main# main# main# main# main
 # inputFile = "rosalind_ptra.txt"
 # #"translateSample.txt" 
-# DNA = "ATGGCCATGGCGCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA"
-# Aminos = "MAMAPRTEINSTRING"
+
+# Sample Set
+DNA = "ATGGCCATGGCGCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA"
+Aminos = "MAMAPRTEINSTRING"
+# Sample Output
+# 1
 
 # DNA,Aminos = parseInput(inputFile)
-# # probeTables()
 
 # findCodonTable(DNA,Aminos)
-# # ATGGCCATGGCGCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA
-# # MAMAPRTEINSTRING
-# # Sample Output
-# # 1
 
 # print(generateCodonStr())
 
+# # probeTables()
 # probeTables(generateCombos(3),'*')
 
 
@@ -309,19 +328,7 @@ ambigMap = checkForAmb()
 printAmbigMap(ambigMap)
 print(genAmbigList(ambigMap))
 
-# # logoMaker(ambigMap, Codon="AAA")
+printBool(hasFrameShift(DNA,Aminos))
 
-# # import json
+logoMaker(Codon="AAA")
 
-# # with open("ambigMap.json", "w") as f:
-# #     json.dump(ambigMap, f, indent=4, separators=(",", ": "))
-
-with open("ambigMap1.py", "w") as f:
-    f.write("ambigMap = ")
-    f.write(repr(ambigMap))
-    
-import pprint
-
-with open("ambigMap.py", "w") as f:
-    f.write("ambigMap = \\\n")
-    pprint.pprint(ambigMap, stream=f, indent=2, width=80)
