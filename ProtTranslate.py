@@ -4,6 +4,10 @@ from Bio import SeqIO
 from Bio import Seq
 import shutil
 
+import logomaker
+import pandas as pd
+import matplotlib.pyplot as plt
+
 def textBool(bool):
     return "Yes" if bool else "No"
 
@@ -206,12 +210,12 @@ def checkAllCodons():
         for codon, aminoMap in blockResult.items():
             if codon not in codonMap:
                 codonMap[codon] = dict()
-            for amino, (tables, count) in aminoMap.items():
+            for amino, tables in aminoMap.items():
                 if amino not in codonMap[codon]:
-                    codonMap[codon][amino] = [tables.copy(), count]
+                    codonMap[codon][amino] = tables.copy()
                 else:
-                    codonMap[codon][amino][0].extend(tables)
-                    codonMap[codon][amino][1] += count
+                    codonMap[codon][amino].extend(tables)
+                    # codonMap[codon][amino][1] += count
     return codonMap
 
 def checkForAmb():
@@ -237,12 +241,43 @@ def genAmbigList(ambigCodons):
         codonList.append(codon)
         
     return codonList
+
+def extractFreqs(ambigMap, Codon):
+    return{amino: [len(locations)] for amino, (locations) in ambigMap[Codon].items()}
+
+def logoMaker(ambigMap, Codon):
+    freqMap = extractFreqs(ambigMap, Codon)
+    allAminos = "ACDEFGHIKLMNPQRSTVWY"
+    
+    dataFrame = pd.DataFrame(freqMap)
+
+    # Fill in all 20 amino acids so logomaker doesn’t break
+    for amino in 'ACDEFGHIKLMNPQRSTVWY*':
+        if amino not in dataFrame.columns:
+            dataFrame[amino] = 0
+
+    # Reorder columns
+    dataFrame = dataFrame[['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
+            'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', '*']]
+
+    # Normalize to get frequency
+    dataFrame = dataFrame.div(dataFrame.sum(axis=1), axis=0)
+
+    # Make the logo
+    logomaker.Logo(dataFrame, color_scheme='chemistry', font_name='Arial', shade_below=.5, fade_below=.5)
+    plt.title(f"Codon {Codon} - Amino Acid Mapping Profile")
+    plt.show()
+    
+
+
 # {
 #     'AAA': {
 #         'K': [[2, 3, 4, 5, 6, 10, 11, 12, 13, 15, 16, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33], 23],
 #         'N': [[14, 21], 2]
 #          }
 # }
+
+
 
 ambigCodons = ["AAA","AGA","AGG","ATA","CTA","CTC","CTG","CTT","TAA","TAG","TCA","TGA","TTA"]
 
@@ -270,6 +305,26 @@ ambigCodons = ["AAA","AGA","AGG","ATA","CTA","CTC","CTG","CTT","TAA","TAG","TCA"
 
 
 # print(checkAllCodons())
-ambigCodons = checkForAmb()
-printAmbigMap(ambigCodons)
-print(genAmbigList(ambigCodons))
+# ambigCodons = checkForAmb()
+# printAmbigMap(ambigCodons)
+# print(genAmbigList(ambigCodons))
+
+
+ambigMap = checkForAmb()
+
+# logoMaker(ambigMap, Codon="AAA")
+
+# import json
+
+# with open("ambigMap.json", "w") as f:
+#     json.dump(ambigMap, f, indent=4, separators=(",", ": "))
+
+with open("ambigMap1.py", "w") as f:
+    f.write("ambigMap = ")
+    f.write(repr(ambigMap))
+    
+import pprint
+
+with open("ambigMap.py", "w") as f:
+    f.write("ambigMap = \\\n")
+    pprint.pprint(ambigMap, stream=f, indent=2, width=80)
