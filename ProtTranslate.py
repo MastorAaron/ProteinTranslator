@@ -182,10 +182,9 @@ def parseOutput(outputBlock):
             amino = outputStr[-1]
             tableNum = int(outputStr.split(" ")[1][:-1])
             if amino not in aminoMap:
-                aminoMap[amino] = [[tableNum],1]
+                aminoMap[amino] = [tableNum]
             else:
-                aminoMap[amino][0].append(tableNum)
-                aminoMap[amino][1]+=1
+                aminoMap[amino].append(tableNum)
     if codon:
         codonMap[codon] = aminoMap
     return codonMap
@@ -229,7 +228,8 @@ def checkForAmb():
 def printAmbigMap(ambigCodons):
     for codon, aminoMap in ambigCodons.items():   
         print(f"{codon}: ")
-        for amino, [locations, freq] in aminoMap.items():
+        for amino, locations in aminoMap.items():
+            freq = len(locations)
             print(f"{amino}: {freq} times in ", end="")
             for tableNum in locations:
                 print(f"{tableNum} ", end="")
@@ -305,19 +305,16 @@ ambigCodons = ["AAA","AGA","AGG","ATA","CTA","CTC","CTG","CTT","TAA","TAG","TCA"
 
 
 # print(checkAllCodons())
-# ambigCodons = checkForAmb()
-# printAmbigMap(ambigCodons)
-# print(genAmbigList(ambigCodons))
-
-
 ambigMap = checkForAmb()
+printAmbigMap(ambigMap)
+print(genAmbigList(ambigMap))
 
-# logoMaker(ambigMap, Codon="AAA")
+# # logoMaker(ambigMap, Codon="AAA")
 
-# import json
+# # import json
 
-# with open("ambigMap.json", "w") as f:
-#     json.dump(ambigMap, f, indent=4, separators=(",", ": "))
+# # with open("ambigMap.json", "w") as f:
+# #     json.dump(ambigMap, f, indent=4, separators=(",", ": "))
 
 with open("ambigMap1.py", "w") as f:
     f.write("ambigMap = ")
