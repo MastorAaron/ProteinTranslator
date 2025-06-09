@@ -160,7 +160,7 @@ def looseHamDist(A,B):
         if A[i] != B[i] and not(
             (A[i] == '*' and B[i] in ['Q', 'W']) or 
             (B[i] == '*' and A[i] in ['Q', 'W'])
-            ):
+        ):
             d+=1  
     return d 
 
@@ -169,6 +169,8 @@ def stitch(strs):
     for string in strs:
         newStr+=string
     return newStr
+
+
 
 def generateCodonStr():
     return stitch(generateCombos(3))
@@ -315,43 +317,71 @@ def printBool(bool):
     # aminoMap = { 'A': [tableNums]}        #refactor form
     # codonMap = {"AAA" : [aminoMap]}
 
-def printList(bag):
+def printList(bag, d=" "):
     for each in bag:
-        print(each)
+        print(each,end=d)
     print()
+
+def popSkips(codon, amino):
+    skips = []
+    for aa in ambigMap[codon]:
+        if aa != amino:
+            skips.append(ambigMap[codon][aa])
+    return skips
+
+def stitchLists(bags):
+    newList= []
+    for eachList in bags:
+        for each in eachList:
+            newList.extend(each)
+    return newList
 
 def deterCandiate(DNA,Aminos):
     localeList=[]
+    skipList = []
     j=0
     ambigAminos=[]
     for i in range(0,len(DNA)-3,3):
         locales = []
+        skips = []
         codon=DNA[i:i+3]
         if isAmbig(codon):
             print(codon)
             amino = Aminos[j]
             print(ambigMap[codon])
             locales = ambigMap[codon][amino]
+            skips = popSkips(codon, amino)
             localeList.append(locales)
+            skipList.append(skips)
             ambigAminos.append(amino)
+            
+            print(f"codon: {codon} was {amino}")
         j+=1
     print("localeList:  ",end="")
-    printList(localeList)
+    printList(stitchLists(localeList)) 
+    print("skipList:  ",end="")
+    printList(stitchLists(skipList))
     print("ambigAminos: ",end="")
     printList(ambigAminos)
 
 def viewCodons(DNA):
     for i in range(0,len(DNA)-3,3):
         codon=DNA[i:i+3]
-        print(f"codon {int(i/3)}: {codon}")
+        print(f"codon {int((i/3)+1)}: {codon}")
 
 def containsAmbig(DNA):
     for i in range(0,len(DNA)-3,3):
         codon=DNA[i:i+3]
-        print(f"codon {int(i/3)}: {codon}")
+        print(f"codon {int((i/3)+1)}: {codon}")
         if isAmbig(codon):
             return True
     return False
+
+def viewAmbig(DNA):
+    for i in range(0,len(DNA)-3,3):
+        codon=DNA[i:i+3]
+        if isAmbig(codon):
+            print(f"codon {int((i/3)+1)}: {codon}")
         
 
 # main# main# main# main# main# main# main# main# main# main# main# main# main# main# main
@@ -361,7 +391,7 @@ inputFile = "rosalind_ptra.txt"
 # Sample Set
 DNA = "ATGGCCATGGCGCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA"
 # DNA = "ATG GCC ATG GCG CCC AGA ACT GAG ATC AAT AGT ACC CGT ATT AAC GGG TGA"
-# Aminos = "MAMAPRTEINSTRING"
+Aminos = "MAMAPRTEINSTRING"
 # Sample Output
 # 1
 
@@ -384,6 +414,7 @@ print(genAmbigList(ambigMap))
 # for codon in ambigCodons:
 #     logoMaker(codon)
 
-print(textBool(containsAmbig(DNA)))
+# print(textBool(containsAmbig(DNA)))
 
-# deterCandiate(DNA,Aminos)
+viewAmbig(DNA)
+deterCandiate(DNA,Aminos)
