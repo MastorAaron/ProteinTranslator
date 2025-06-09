@@ -324,7 +324,7 @@ def deterCandiate(DNA,Aminos):
     localeList=[]
     j=0
     ambigAminos=[]
-    for i in range(0,3,len(DNA)-3):
+    for i in range(0,len(DNA)-3,3):
         locales = []
         codon=DNA[i:i+3]
         if isAmbig(codon):
