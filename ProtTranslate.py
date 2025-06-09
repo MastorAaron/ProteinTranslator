@@ -263,9 +263,18 @@ def genAmbigList(ambigCodons):
 def extractFreqs(ambigMap, Codon):
     return{amino: [len(locations)] for amino, (locations) in ambigMap[Codon].items()}
 
+custom_colors = {
+    'A': 'green', 'C': 'blue', 'D': 'red', 'E': 'red',
+    'F': 'purple', 'G': 'orange', 'H': 'teal', 'I': 'olive',
+    'K': 'pink', 'L': 'navy', 'M': 'salmon', 'N': 'brown',
+    'P': 'lime', 'Q': 'gray', 'R': 'gold', 'S': 'cyan',
+    'T': 'magenta', 'V': 'orchid', 'W': 'turquoise',
+    'Y': 'chocolate', '*': 'black'
+}
+
 def logoMaker(Codon):
     freqMap = extractFreqs(ambigMap, Codon)
-    allAminos = "ACDEFGHIKLMNPQRSTVWY"
+    allAminos = "ACDEFGHIKLMNPQRSTVWY*"
     
     dataFrame = pd.DataFrame(freqMap)
 
@@ -282,8 +291,11 @@ def logoMaker(Codon):
     dataFrame = dataFrame.div(dataFrame.sum(axis=1), axis=0)
 
     # Make the logo
-    logomaker.Logo(dataFrame, color_scheme='chemistry', font_name='Arial', shade_below=.5, fade_below=.5)
+    logomaker.Logo(dataFrame, color_scheme=custom_colors, font_name='Arial', shade_below=.5, fade_below=.5)
     plt.title(f"Codon {Codon} - Amino Acid Mapping Profile")
+    plt.figure(figsize=(2, 2))  # square
+    fig, axes = plt.subplots(1, len(Codon), figsize=(len(Codon) * 2.5, 3))
+
     plt.show()
 
 ambigCodons = ["AAA","AGA","AGG","ATA","CTA","CTC","CTG","CTT","TAA","TAG","TCA","TGA","TTA"]
@@ -303,13 +315,53 @@ def printBool(bool):
     # aminoMap = { 'A': [tableNums]}        #refactor form
     # codonMap = {"AAA" : [aminoMap]}
 
+def printList(bag):
+    for each in bag:
+        print(each)
+    print()
+
+def deterCandiate(DNA,Aminos):
+    localeList=[]
+    j=0
+    ambigAminos=[]
+    for i in range(0,3,len(DNA)-3):
+        locales = []
+        codon=DNA[i:i+3]
+        if isAmbig(codon):
+            print(codon)
+            amino = Aminos[j]
+            print(ambigMap[codon])
+            locales = ambigMap[codon][amino]
+            localeList.append(locales)
+            ambigAminos.append(amino)
+        j+=1
+    print("localeList:  ",end="")
+    printList(localeList)
+    print("ambigAminos: ",end="")
+    printList(ambigAminos)
+
+def viewCodons(DNA):
+    for i in range(0,len(DNA)-3,3):
+        codon=DNA[i:i+3]
+        print(f"codon {int(i/3)}: {codon}")
+
+def containsAmbig(DNA):
+    for i in range(0,len(DNA)-3,3):
+        codon=DNA[i:i+3]
+        print(f"codon {int(i/3)}: {codon}")
+        if isAmbig(codon):
+            return True
+    return False
+        
+
 # main# main# main# main# main# main# main# main# main# main# main# main# main# main# main
-# inputFile = "rosalind_ptra.txt"
+inputFile = "rosalind_ptra.txt"
 # #"translateSample.txt" 
 
 # Sample Set
 DNA = "ATGGCCATGGCGCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA"
-Aminos = "MAMAPRTEINSTRING"
+# DNA = "ATG GCC ATG GCG CCC AGA ACT GAG ATC AAT AGT ACC CGT ATT AAC GGG TGA"
+# Aminos = "MAMAPRTEINSTRING"
 # Sample Output
 # 1
 
@@ -325,10 +377,13 @@ Aminos = "MAMAPRTEINSTRING"
 
 # print(checkAllCodons())
 ambigMap = checkForAmb()
-printAmbigMap(ambigMap)
+# printAmbigMap(ambigMap)
 print(genAmbigList(ambigMap))
 
-printBool(hasFrameShift(DNA,Aminos))
+# printBool(hasFrameShift(DNA,Aminos))
+# for codon in ambigCodons:
+#     logoMaker(codon)
 
-logoMaker(Codon="AAA")
+print(textBool(containsAmbig(DNA)))
 
+# deterCandiate(DNA,Aminos)
